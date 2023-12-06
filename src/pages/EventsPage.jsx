@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Heading, Card, SimpleGrid, Text, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
+import { useLocalStorage } from "../components/useLocalStorage";
 
 export const EventsPage = () => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useLocalStorage("events", []);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -28,6 +29,7 @@ export const EventsPage = () => {
       method: "POST",
       body: JSON.stringify(event),
     });
+
     event.id = (await response.json()).id;
     setEvents(events.concat(event));
   };
