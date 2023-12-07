@@ -1,0 +1,108 @@
+////////// WERKENDE EventsPage: //////////
+import React, { useEffect, useState } from "react";
+import {
+  Heading,
+  Card,
+  SimpleGrid,
+  Text,
+  Image,
+  Badge,
+} from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { AddEvent } from "./AddEvent";
+
+export const EventsPage = () => {
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventResponse = await fetch("http://localhost:3000/events");
+        if (!eventResponse.ok) {
+          throw new Error("Failed to fetch events");
+        }
+        const eventData = await eventResponse.json();
+        setEvents(eventData);
+        console.log(eventData);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const addEvent = async (event) => {
+    try {
+      const response = await fetch("http://localhost:3000/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(event),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add event");
+      }
+
+      const newEvent = await response.json();
+
+      setEvents((prevEvents) => [...prevEvents, newEvent]);
+    } catch (error) {
+      console.error("Error adding event:", error);
+    }
+  };
+
+  const deleteEvent = async (eventId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/events/${eventId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete event");
+      }
+
+      const updatedEvents = events.filter((event) => event.id !== eventId);
+      setEvents(updatedEvents);
+
+      console.log(`Event with ID ${eventId} deleted`);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+
+  return (
+    <div className="events-list">
+      <Heading>List of events</Heading>
+      <AddEvent addEvent={addEvent} />
+      <ul>
+        <SimpleGrid columns={(1, 2, 3)} spacingY="20px">
+          {events.map((event) => (
+            <li key={event.id}>
+              <Link key={event.id} to={`/events/${event.id}`}>
+                <Card key={event.id} maxW="sm">
+                  <Image
+                    src={event.image}
+                    alt={event.title}
+                    borderRadius="lg"
+                  />
+                  <Text>{event.title}</Text>
+                  <Text>{event.description}</Text>
+                  <Text>{event.startTime}</Text>
+                  <Text>{event.endTime}</Text>
+                </Card>
+                <Badge colorScheme="red">
+                  <button onClick={() => deleteEvent(event.id)}>
+                    Delete Event
+                  </button>
+                </Badge>
+              </Link>
+            </li>
+          ))}
+        </SimpleGrid>
+      </ul>
+    </div>
+  );
+};
