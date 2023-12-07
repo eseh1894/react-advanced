@@ -1,11 +1,36 @@
-import React, { useEffect } from "react";
-import { Heading, Card, SimpleGrid, Text, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { SearchBar } from "../components/SearchBar";
+import {
+  Heading,
+  Card,
+  SimpleGrid,
+  Text,
+  Image,
+  Badge,
+  Button,
+  Modal,
+  ModalContent,
+  ModalFooter,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
-import { useLocalStorage } from "../components/useLocalStorage";
 
 export const EventsPage = () => {
-  const [events, setEvents] = useLocalStorage("events", []);
+  const [events, setEvents] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+
+  const handleSearch = (searchTerm) => {
+    const filtered = events.filter((event) => {
+      return (
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchTerm.toLowerCase())
+        // Add more conditions for filtering if needed
+      );
+    });
+    setFilteredEvents(filtered);
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -16,31 +41,102 @@ export const EventsPage = () => {
         }
         const eventData = await eventResponse.json();
         setEvents(eventData);
+        console.log(eventData);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const categoriesResponse = await fetch(
+          "http://localhost:3000/categories"
+        );
+        if (!categoriesResponse.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData);
+        console.log(categoriesData);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
     fetchEvents();
+    fetchCategories();
   }, []);
 
   const addEvent = async (event) => {
-    const response = await fetch("http://localhost:3000/events", {
-      method: "POST",
-      body: JSON.stringify(event),
-    });
+    try {
+      const response = await fetch("http://localhost:3000/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(event),
+      });
 
-    event.id = (await response.json()).id;
-    setEvents(events.concat(event));
+      if (!response.ok) {
+        throw new Error("Failed to add event");
+      }
+
+      const newEvent = await response.json();
+
+      setEvents((prevEvents) => [...prevEvents, newEvent]);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding event:", error);
+    }
+  };
+
+  const deleteEvent = async (eventId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/events/${eventId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete event");
+      }
+
+      const updatedEvents = events.filter((event) => event.id !== eventId);
+      setEvents(updatedEvents);
+
+      console.log(`Event with ID ${eventId} deleted`);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   return (
     <div className="events-list">
       <Heading>List of events</Heading>
-      <AddEvent addEvent={addEvent} />
+      <SearchBar onSearch={handleSearch} />
+
+      <Button onClick={() => setIsModalOpen(true)}>Add Event</Button>
+      <Modal
+        blockScrollOnMount={false}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <ModalContent>
+          <AddEvent addEvent={addEvent} />
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => setIsModalOpen(false)}
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       <ul>
         <SimpleGrid columns={(1, 2, 3)} spacingY="20px">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <li key={event.id}>
               <Link key={event.id} to={`/events/${event.id}`}>
                 <Card key={event.id} maxW="sm">
@@ -53,7 +149,13 @@ export const EventsPage = () => {
                   <Text>{event.description}</Text>
                   <Text>{event.startTime}</Text>
                   <Text>{event.endTime}</Text>
+                  <Text>{categories.name}</Text>
                 </Card>
+                <Badge colorScheme="red">
+                  <button onClick={() => deleteEvent(event.id)}>
+                    Delete Event
+                  </button>
+                </Badge>
               </Link>
             </li>
           ))}

@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 export const AddEvent = ({ addEvent }) => {
-  const [title, setTitle] = useState([]);
-  const [description, setDescription] = useState([]);
-  const [image, setImage] = useState([]);
-  const [location, setLoaction] = useState([]);
-  const [startTime, setStartTime] = useState([]);
-  const [endTime, setEndTime] = useState([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+  const [location, setLoaction] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
