@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextInput } from "./ui/TextInput";
+import { Search2Icon } from "@chakra-ui/icons";
 
 export const SearchBar = ({ onSearch }) => {
   const [searchField, setSearchField] = useState("");
@@ -11,7 +12,7 @@ export const SearchBar = ({ onSearch }) => {
 
   return (
     <div>
-      <label>Search Events</label>
+      <Search2Icon />
       <TextInput changeFn={handleChange} />
     </div>
   );

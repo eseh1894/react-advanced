@@ -10,10 +10,12 @@ import {
   Modal,
   ModalContent,
   ModalFooter,
+  Menu,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
 import { SearchBar } from "../components/SearchBar";
+import { EventFilter } from "../components/EventFilter";
 
 export const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -29,6 +31,19 @@ export const EventsPage = () => {
       );
     });
     setFilteredEvents(filtered);
+  };
+
+  const handleCategorySelect = (categoryId) => {
+    if (categoryId === selectedCategory) {
+      setSelectedCategory(null);
+      setFilteredEvents(events);
+    } else {
+      setSelectedCategory(categoryId);
+      const filtered = events.filter((event) =>
+        event.categoryIds.includes(categoryId)
+      );
+      setFilteredEvents(filtered);
+    }
   };
 
   useEffect(() => {
@@ -47,7 +62,24 @@ export const EventsPage = () => {
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const categoryResponse = await fetch(
+          "http://localhost:3000/categories"
+        );
+        if (!categoryResponse.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        const categoryData = await categoryResponse.json();
+        setCategories(categoryData);
+        console.log(categoryData);
+      } catch (error) {
+        console.log("Error fetching categories:", error);
+      }
+    };
+
     fetchEvents();
+    fetchCategories();
   }, []);
 
   const addEvent = async (event) => {
@@ -95,7 +127,11 @@ export const EventsPage = () => {
   return (
     <div className="events-list">
       <Heading>List of events</Heading>
-      <SearchBar />
+      <SearchBar onSearch={handleSearch} />
+      <EventFilter
+        categories={categories}
+        onSelectCategory={handleCategorySelect}
+      />
 
       <Button onClick={() => setIsModalOpen(true)}>Add Event</Button>
       <Modal
@@ -119,7 +155,7 @@ export const EventsPage = () => {
 
       <ul>
         <SimpleGrid columns={(1, 2, 3)} spacingY="20px">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <li key={event.id}>
               <Link key={event.id} to={`/events/${event.id}`}>
                 <Card key={event.id} maxW="sm">
