@@ -22,6 +22,7 @@ export const EventsPage = () => {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filteredEvents, setFilteredEvents] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const handleSearch = (searchTerm) => {
     const filtered = events.filter((event) => {
