@@ -1,18 +1,18 @@
 import { useState } from "react";
 
-export const AddEvent = ({ addEvent, categories }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
-  const [location, setLoaction] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+export const EditEvents = ({ editEvent, categories, event }) => {
+  const [title, setTitle] = useState(event.title);
+  const [description, setDescription] = useState(event.description);
+  const [image, setImage] = useState(event.image);
+  const [location, setLoaction] = useState(event.location);
+  const [startTime, setStartTime] = useState(event.startTime);
+  const [endTime, setEndTime] = useState(event.endTime);
+  const [selectedCategory, setSelectedCategory] = useState(event.categoryIds);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    addEvent({
+    editEvent(event.id, {
       title,
       description,
       image,
@@ -21,19 +21,11 @@ export const AddEvent = ({ addEvent, categories }) => {
       endTime,
       selectedCategory,
     });
-
-    setTitle("");
-    setDescription("");
-    setImage("");
-    setLoaction("");
-    setStartTime("");
-    setEndTime("");
-    setSelectedCategory("");
   };
 
   return (
     <div>
-      AddEvent
+      Edit Event
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -48,7 +40,7 @@ export const AddEvent = ({ addEvent, categories }) => {
           onChange={(e) => setDescription(e.target.value)}
         />
         <input
-          type="file"
+          type="text"
           placeholder="image"
           value={image}
           onChange={(e) => setImage(e.target.value)}
@@ -82,7 +74,7 @@ export const AddEvent = ({ addEvent, categories }) => {
             </option>
           ))}
         </select>
-        <button type="submit">Add Event</button>
+        <button type="submit">Save Changes</button>
       </form>
     </div>
   );

@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
 import { SearchBar } from "../components/SearchBar";
 import { EventFilter } from "../components/EventFilter";
+import { EditEvents } from "./EditEvents";
 
 export const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -23,6 +24,9 @@ export const EventsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const handleSearch = (searchTerm) => {
     const filtered = events.filter((event) => {
@@ -40,8 +44,8 @@ export const EventsPage = () => {
       setFilteredEvents(events);
     } else {
       setSelectedCategory(categoryId);
-      const filtered = events.filter((event) =>
-        event.categoryIds.includes(categoryId)
+      const filtered = events.filter(
+        (event) => event.categoryIds && event.categoryIds.includes(categoryId)
       );
       setFilteredEvents(filtered);
     }
@@ -125,6 +129,41 @@ export const EventsPage = () => {
     }
   };
 
+  const editEvent = async (eventId, updatedEventData) => {
+    try {
+      const response = await fetch(`http://localhost:3000/events/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedEventData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to edit event");
+      }
+
+      const editedEvent = await response.json();
+
+      setEvents((prevEvents) =>
+        prevEvents.map((event) => (event.id === eventId ? editedEvent : event))
+      );
+
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error editing event:", error);
+    }
+  };
+
+  const openEditModal = (event) => {
+    setSelectedEvent(event);
+    setIsEditModalOpen(true);
+  };
+  const closeEditModal = () => {
+    setSelectedEvent(null);
+    setIsEditModalOpen(false);
+  };
+
   return (
     <div className="events-list">
       <Heading>List of events</Heading>
@@ -141,7 +180,7 @@ export const EventsPage = () => {
         onClose={() => setIsModalOpen(false)}
       >
         <ModalContent>
-          <AddEvent addEvent={addEvent} />
+          <AddEvent addEvent={addEvent} categories={categories} />
           <ModalFooter>
             <Button
               colorScheme="blue"
@@ -158,7 +197,7 @@ export const EventsPage = () => {
         <SimpleGrid columns={(1, 2, 3)} spacingY="20px">
           {filteredEvents.map((event) => (
             <li key={event.id}>
-              <Link key={event.id} to={`/events/${event.id}`}>
+              <Link key={event.id} to={`/event/${event.id}`}>
                 <Card key={event.id} maxW="sm">
                   <Image
                     src={event.image}
@@ -175,6 +214,36 @@ export const EventsPage = () => {
                   <button onClick={() => deleteEvent(event.id)}>
                     Delete Event
                   </button>
+                </Badge>
+                <Badge colorScheme="yellow">
+                  <button onClick={() => openEditModal(event)}>
+                    Edit Event
+                  </button>
+                  <Modal
+                    blockScrollOnMount={false}
+                    isOpen={isEditModalOpen}
+                    onClose={closeEditModal}
+                  >
+                    <ModalContent>
+                      {selectedEvent && (
+                        <EditEvents
+                          event={selectedEvent}
+                          editEvent={editEvent}
+                          categories={categories}
+                          closeEditModal={closeEditModal}
+                        />
+                      )}
+                    </ModalContent>
+                    <ModalFooter>
+                      <Button
+                        colorScheme="blue"
+                        mr={3}
+                        onClick={closeEditModal}
+                      >
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
                 </Badge>
               </Link>
             </li>

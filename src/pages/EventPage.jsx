@@ -1,34 +1,71 @@
-import React from "react";
-import { Heading } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Heading, Text, Image } from "@chakra-ui/react";
+import { useParams } from "react-router-dom";
 
 export const EventPage = () => {
-  const [events, setEvents] = useState([]);
+  const { eventId } = useParams();
+  const [eventDetails, setEventDetails] = useState([]);
+  const [userDetails, setUserDetails] = useState([]);
+  const [categoryDetails, setCategoryDetails] = useState([]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchEventDetails = async () => {
       try {
-        const eventResponse = await fetch("http://localhost:3000/events");
-        if (!eventResponse.ok) {
+        const response = await fetch(`http://localhost:3000/events/${eventId}`);
+        const userResponse = await fetch(`http://localhost:3000/users`);
+        const categoryResponse = await fetch(
+          `http://localhost:3000/categories`
+        );
+
+        if (!response.ok || !userResponse.ok || !categoryResponse.ok) {
           throw new Error("Failed to fetch events");
         }
-        const eventData = await eventResponse.json();
-        setEvents(eventData);
+
+        const eventData = await response.json();
+        const userData = await userResponse.json();
+        const categoryData = await categoryResponse.json();
+
+        setCategoryDetails(categoryData);
+
+        setEventDetails(eventData);
         console.log(eventData);
+
+        const creator = userData.find(
+          (user) => user.id === eventData.createdBy
+        );
+        setUserDetails(creator);
       } catch (error) {
-        console.error("Error fetching events:", error);
+        console.error("Error fetching event:", error);
       }
     };
 
-    fetchEvents();
-  }, []);
+    fetchEventDetails();
+  }, [eventId]);
+
   return (
     <div className="event-page">
       <Heading>Event</Heading>
 
-      <Text>{events.title}</Text>
-      <Text>{event.description}</Text>
-      <Text>{event.startTime}</Text>
-      <Text>{event.endTime}</Text>
+      {eventDetails && userDetails && categoryDetails.length > 0 && (
+        <>
+          <Heading>{eventDetails.title}</Heading>
+
+          <Text>{eventDetails.description}</Text>
+          <Text>{eventDetails.startTime}</Text>
+          <Text>{eventDetails.endTime}</Text>
+          {eventDetails.image && (
+            <Image src={eventDetails.image} alt={eventDetails.title} />
+          )}
+          <Text>{categoryDetails.name}</Text>
+          <Text>Created By: {userDetails.name}</Text>
+          <Image
+            borderRadius="full"
+            boxSize="150px"
+            alt="{userDetaisl.name}"
+            src={userDetails.image}
+          />
+        </>
+      )}
     </div>
   );
 };
