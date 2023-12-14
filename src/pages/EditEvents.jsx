@@ -12,7 +12,7 @@ export const EditEvents = ({ editEvent, categories, event }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    editEvent(event.id, {
+    editEvent(selectedEvent.id, {
       title,
       description,
       image,
@@ -74,7 +74,9 @@ export const EditEvents = ({ editEvent, categories, event }) => {
             </option>
           ))}
         </select>
-        <button type="submit">Save Changes</button>
+        <button type="submit" onClick={handleSubmit}>
+          Save Changes
+        </button>
       </form>
     </div>
   );

@@ -149,7 +149,7 @@ export const EventsPage = () => {
         prevEvents.map((event) => (event.id === eventId ? editedEvent : event))
       );
 
-      setIsEditModalOpen(false);
+      console.log(`Event with ID ${eventId} edited`);
     } catch (error) {
       console.error("Error editing event:", error);
     }
@@ -215,37 +215,29 @@ export const EventsPage = () => {
                     Delete Event
                   </button>
                 </Badge>
-                <Badge colorScheme="yellow">
-                  <button onClick={() => openEditModal(event)}>
-                    Edit Event
-                  </button>
-                  <Modal
-                    blockScrollOnMount={false}
-                    isOpen={isEditModalOpen}
-                    onClose={closeEditModal}
-                  >
-                    <ModalContent>
-                      {selectedEvent && (
-                        <EditEvents
-                          event={selectedEvent}
-                          editEvent={editEvent}
-                          categories={categories}
-                          closeEditModal={closeEditModal}
-                        />
-                      )}
-                    </ModalContent>
-                    <ModalFooter>
-                      <Button
-                        colorScheme="blue"
-                        mr={3}
-                        onClick={closeEditModal}
-                      >
-                        Close
-                      </Button>
-                    </ModalFooter>
-                  </Modal>
-                </Badge>
               </Link>
+              <Badge colorScheme="yellow">
+                <button onClick={() => openEditModal(event)}>Edit Event</button>
+                <Modal
+                  blockScrollOnMount={false}
+                  isOpen={isEditModalOpen}
+                  onClose={closeEditModal}
+                >
+                  <ModalContent>
+                    {selectedEvent && (
+                      <EditEvents
+                        event={selectedEvent}
+                        editEvent={editEvent}
+                        categories={categories}
+                        closeEditModal={closeEditModal}
+                      />
+                    )}
+                  </ModalContent>
+                  <ModalFooter>
+                    <button onClick={() => deleteEvent(event.id)}>Close</button>
+                  </ModalFooter>
+                </Modal>
+              </Badge>
             </li>
           ))}
         </SimpleGrid>
