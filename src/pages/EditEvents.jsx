@@ -12,7 +12,7 @@ export const EditEvents = ({ editEvent, categories, event }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    editEvent(selectedEvent.id, {
+    editEvent(event.id, {
       title,
       description,
       image,

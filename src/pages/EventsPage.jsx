@@ -26,7 +26,7 @@ export const EventsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState({});
 
   const handleSearch = (searchTerm) => {
     const filtered = events.filter((event) => {
@@ -148,6 +148,8 @@ export const EventsPage = () => {
       setEvents((prevEvents) =>
         prevEvents.map((event) => (event.id === eventId ? editedEvent : event))
       );
+
+      setIsEditModalOpen(false);
 
       console.log(`Event with ID ${eventId} edited`);
     } catch (error) {
