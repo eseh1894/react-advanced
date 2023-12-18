@@ -9,8 +9,8 @@ export const EditEvents = ({ editEvent, categories, event }) => {
   const [endTime, setEndTime] = useState(event.endTime);
   const [selectedCategory, setSelectedCategory] = useState(event.categoryIds);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     editEvent(event.id, {
       title,
@@ -19,7 +19,7 @@ export const EditEvents = ({ editEvent, categories, event }) => {
       location,
       startTime,
       endTime,
-      selectedCategory,
+      categoryIds: selectedCategory,
     });
   };
 
