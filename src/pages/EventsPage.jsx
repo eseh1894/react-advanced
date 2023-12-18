@@ -10,7 +10,6 @@ import {
   Modal,
   ModalContent,
   ModalFooter,
-  Menu,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
