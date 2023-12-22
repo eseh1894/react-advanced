@@ -7,7 +7,7 @@ export const AddEvent = ({ addEvent, categories }) => {
   const [location, setLoaction] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(event.categoryIds);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -20,6 +20,7 @@ export const AddEvent = ({ addEvent, categories }) => {
       startTime,
       endTime,
       selectedCategory,
+      categoryIds: selectedCategory,
     });
 
     setTitle("");
@@ -82,7 +83,9 @@ export const AddEvent = ({ addEvent, categories }) => {
             </option>
           ))}
         </select>
-        <button type="submit">Add Event</button>
+        <button type="submit" onClick={handleSubmit}>
+          Add Event
+        </button>
       </form>
     </div>
   );

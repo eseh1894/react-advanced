@@ -84,7 +84,7 @@ export const EventsPage = () => {
 
     fetchEvents();
     fetchCategories();
-  }, []);
+  }, [isEditModalOpen, isEditModalOpen]);
 
   const addEvent = async (event) => {
     try {
@@ -209,7 +209,7 @@ export const EventsPage = () => {
                   <Text>{event.description}</Text>
                   <Text>{event.startTime}</Text>
                   <Text>{event.endTime}</Text>
-                  <Text>{categories.name}</Text>
+                  <Text>{categories.id}</Text>
                 </Card>
                 <Badge colorScheme="red">
                   <button onClick={() => deleteEvent(event.id)}>

@@ -40,7 +40,7 @@ export const EditEvents = ({ editEvent, categories, event }) => {
           onChange={(e) => setDescription(e.target.value)}
         />
         <input
-          type="text"
+          type="file"
           placeholder="image"
           value={image}
           onChange={(e) => setImage(e.target.value)}
