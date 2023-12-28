@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom";
 
 export const EventPage = () => {
   const { eventId } = useParams();
-  const [eventDetails, setEventDetails] = useState([]);
-  const [userDetails, setUserDetails] = useState([]);
+  const [eventDetails, setEventDetails] = useState({});
+  const [userDetails, setUserDetails] = useState({});
   const [categoryDetails, setCategoryDetails] = useState([]);
 
   useEffect(() => {
@@ -28,7 +28,6 @@ export const EventPage = () => {
         setCategoryDetails(categoryData);
 
         setEventDetails(eventData);
-        console.log(eventData);
 
         const creator = userData.find(
           (user) => user.id === eventData.createdBy
@@ -56,7 +55,12 @@ export const EventPage = () => {
           {eventDetails.image && (
             <Image src={eventDetails.image} alt={eventDetails.title} />
           )}
-          <Text>{categoryDetails.name}</Text>
+          {categoryDetails.map((category) => {
+            if (category.id === eventDetails.selectedCategory) {
+              return <Text key={category.id}>Category: {category.name}</Text>;
+            }
+            return null;
+          })}
           <Text>Created By: {userDetails.name}</Text>
           <Image
             borderRadius="full"

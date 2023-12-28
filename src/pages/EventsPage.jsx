@@ -84,7 +84,7 @@ export const EventsPage = () => {
 
     fetchEvents();
     fetchCategories();
-  }, [isEditModalOpen, isEditModalOpen]);
+  }, [isEditModalOpen, isModalOpen]);
 
   const addEvent = async (event) => {
     try {
@@ -209,7 +209,12 @@ export const EventsPage = () => {
                   <Text>{event.description}</Text>
                   <Text>{event.startTime}</Text>
                   <Text>{event.endTime}</Text>
-                  <Text>{categories.id}</Text>
+                  {categories.map((category) =>
+                    event.categoryIds &&
+                    event.categoryIds.includes(category.id) ? (
+                      <Text key={category.id}>Category: {category.name}</Text>
+                    ) : null
+                  )}
                 </Card>
                 <Badge colorScheme="red">
                   <button onClick={() => deleteEvent(event.id)}>

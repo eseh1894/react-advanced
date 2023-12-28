@@ -3,11 +3,11 @@ import { useState } from "react";
 export const AddEvent = ({ addEvent, categories }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [location, setLoaction] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(event.categoryIds);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,7 +29,7 @@ export const AddEvent = ({ addEvent, categories }) => {
     setLoaction("");
     setStartTime("");
     setEndTime("");
-    setSelectedCategory("");
+    setSelectedCategory([]);
   };
 
   return (
