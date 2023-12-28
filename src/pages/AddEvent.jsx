@@ -7,10 +7,10 @@ export const AddEvent = ({ addEvent, categories }) => {
   const [location, setLoaction] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState([]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     addEvent({
       title,
@@ -19,17 +19,24 @@ export const AddEvent = ({ addEvent, categories }) => {
       location,
       startTime,
       endTime,
-      selectedCategory,
       categoryIds: selectedCategory,
     });
 
     setTitle("");
     setDescription("");
-    setImage("");
+    setImage(null);
     setLoaction("");
     setStartTime("");
     setEndTime("");
     setSelectedCategory([]);
+  };
+
+  const handleCategoryChange = (e) => {
+    const selectedCategoryIds = Array.from(e.target.selectedOptions, (option) =>
+      categories.find((category) => category.id === parseInt(option.value))
+    );
+
+    setSelectedCategory(selectedCategoryIds);
   };
 
   return (
