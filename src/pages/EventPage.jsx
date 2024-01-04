@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Heading, Text, Image } from "@chakra-ui/react";
+import {
+  Heading,
+  Text,
+  Image,
+  Badge,
+  Modal,
+  ModalContent,
+  ModalFooter,
+  Button,
+} from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
+import { EditEvents } from "./EditEvents";
+import { DeleteConfirmation } from "../components/DeleteConfirmation";
 
 export const EventPage = () => {
   const { eventId } = useParams();
   const [eventDetails, setEventDetails] = useState({});
   const [userDetails, setUserDetails] = useState({});
   const [categoryDetails, setCategoryDetails] = useState([]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState({});
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -33,6 +47,10 @@ export const EventPage = () => {
           (user) => user.id === eventData.createdBy
         );
         setUserDetails(creator);
+
+        console.log(eventData);
+
+        console.log(categoryDetails);
       } catch (error) {
         console.error("Error fetching event:", error);
       }
@@ -41,6 +59,22 @@ export const EventPage = () => {
     fetchEventDetails();
   }, [eventId]);
 
+  const openEditModal = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const confirmDelete = (eventId) => {
+    setEventToDelete(eventId);
+  };
+
+  const cancelDelete = () => {
+    setEventToDelete(null);
+  };
+
   return (
     <div className="event-page">
       <Heading>Event</Heading>
@@ -48,10 +82,9 @@ export const EventPage = () => {
       {eventDetails && userDetails && categoryDetails.length > 0 && (
         <>
           <Heading>{eventDetails.title}</Heading>
-
           <Text>{eventDetails.description}</Text>
-          <Text>{eventDetails.startTime}</Text>
-          <Text>{eventDetails.endTime}</Text>
+          <Text>Start Time: {eventDetails.startTime}</Text>
+          <Text>End Time: {eventDetails.endTime}</Text>
           {eventDetails.image && (
             <Image src={eventDetails.image} alt={eventDetails.title} />
           )}
@@ -68,6 +101,37 @@ export const EventPage = () => {
             alt="{userDetaisl.name}"
             src={userDetails.image}
           />
+          <Badge colorScheme="yellow">
+            <Button onClick={openEditModal}>Edit Event</Button>
+            <Modal
+              blockScrollOnMount={false}
+              isOpen={isEditModalOpen}
+              onClose={closeEditModal}
+            >
+              <ModalContent>
+                {eventDetails && (
+                  <EditEvents
+                    event={eventDetails}
+                    editEvent={() => {}}
+                    categories={categoryDetails}
+                    closeEditModal={closeEditModal}
+                    setImage={() => {}}
+                  />
+                )}
+              </ModalContent>
+              <ModalFooter>
+                <Button onClick={closeEditModal}>Close</Button>
+              </ModalFooter>
+            </Modal>
+          </Badge>
+          <Badge colorScheme="red">
+            <DeleteConfirmation
+              onConfirmDelete={() => deleteEvent(eventDetails.id)}
+              eventId={eventDetails.id}
+              onCancelDelete={cancelDelete}
+            />
+          </Badge>
+          ;
         </>
       )}
     </div>

@@ -3,16 +3,27 @@ import { useState } from "react";
 export const AddEvent = ({ addEvent, categories }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState([]);
   const [location, setLoaction] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [selectedCategory, setSelectedCategory] = useState([]);
 
-  const handleSubmit = (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    addEvent({
+    const newEvent = {
       title,
       description,
       image,
@@ -20,7 +31,27 @@ export const AddEvent = ({ addEvent, categories }) => {
       startTime,
       endTime,
       categoryIds: selectedCategory,
-    });
+    };
+
+    try {
+      const response = await addEvent(newEvent);
+      if (response.ok) {
+        const eventResponse = await fetch(
+          `http://localhost:3000/events/${response.id}`
+        );
+        if (!eventResponse.ok) {
+          throw new Error("Failed to fetch newly added event details");
+        }
+        const eventData = await eventResponse.json();
+        setEventDetails(eventData);
+
+        history.push(`/event/${response.id}`);
+      } else {
+        throw new Error("Failed to add event");
+      }
+    } catch (error) {
+      console.error("Error adding event:", error);
+    }
 
     setTitle("");
     setDescription("");
@@ -30,10 +61,9 @@ export const AddEvent = ({ addEvent, categories }) => {
     setEndTime("");
     setSelectedCategory([]);
   };
-
   const handleCategoryChange = (e) => {
     const selectedCategoryIds = Array.from(e.target.selectedOptions, (option) =>
-      categories.find((category) => category.id === parseInt(option.value))
+      parseInt(option.value)
     );
 
     setSelectedCategory(selectedCategoryIds);
@@ -58,7 +88,7 @@ export const AddEvent = ({ addEvent, categories }) => {
         <input
           type="file"
           placeholder="image"
-          value={image}
+          accept="image/*"
           onChange={(e) => setImage(e.target.value)}
         />
         <input
@@ -80,8 +110,18 @@ export const AddEvent = ({ addEvent, categories }) => {
           onChange={(e) => setEndTime(e.target.value)}
         />
         <select
+          multiple
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            const options = e.target.options;
+            const selectedCategoryIds = [];
+            for (let i = 0; i < options.length; i++) {
+              if (options[i].selected) {
+                selectedCategoryIds.push(parseInt(options[i].value));
+              }
+            }
+            setSelectedCategory(selectedCategoryIds);
+          }}
         >
           <option value="">Select Category</option>
           {categories.map((category) => (

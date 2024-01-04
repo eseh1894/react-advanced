@@ -16,6 +16,7 @@ import { AddEvent } from "./AddEvent";
 import { SearchBar } from "../components/SearchBar";
 import { EventFilter } from "../components/EventFilter";
 import { EditEvents } from "./EditEvents";
+import { DeleteConfirmation } from "../components/DeleteConfirmation";
 
 export const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -26,6 +27,9 @@ export const EventsPage = () => {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
+
+  const [eventToDelete, setEventToDelete] = useState(null);
+  const [image, setImage] = useState("");
 
   const handleSearch = (searchTerm) => {
     const filtered = events.filter((event) => {
@@ -119,8 +123,9 @@ export const EventsPage = () => {
         throw new Error("Failed to delete event");
       }
 
-      const updatedEvents = events.filter((event) => event.id !== eventId);
-      setEvents(updatedEvents);
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event.id !== eventId)
+      );
 
       console.log(`Event with ID ${eventId} deleted`);
     } catch (error) {
@@ -148,6 +153,10 @@ export const EventsPage = () => {
         prevEvents.map((event) => (event.id === eventId ? editedEvent : event))
       );
 
+      if (editedEvent.image) {
+        setImage(editedEvent.image);
+      }
+
       setIsEditModalOpen(false);
 
       console.log(`Event with ID ${eventId} edited`);
@@ -163,6 +172,14 @@ export const EventsPage = () => {
   const closeEditModal = () => {
     setSelectedEvent(null);
     setIsEditModalOpen(false);
+  };
+
+  const confirmDelete = (eventId) => {
+    setEventToDelete(eventId);
+  };
+
+  const cancelDelete = () => {
+    setEventToDelete(null);
   };
 
   return (
@@ -207,21 +224,25 @@ export const EventsPage = () => {
                   />
                   <Text>{event.title}</Text>
                   <Text>{event.description}</Text>
-                  <Text>{event.startTime}</Text>
-                  <Text>{event.endTime}</Text>
+                  <Text> Start Time: {event.startTime}</Text>
+                  <Text> End Time: {event.endTime}</Text>
                   {categories.map((category) =>
                     event.categoryIds &&
                     event.categoryIds.includes(category.id) ? (
-                      <Text key={category.id}>Category: {category.name}</Text>
+                      <Badge colorScheme="purple">
+                        <Text key={category.id}>Category: {category.name}</Text>
+                      </Badge>
                     ) : null
                   )}
                 </Card>
-                <Badge colorScheme="red">
-                  <button onClick={() => deleteEvent(event.id)}>
-                    Delete Event
-                  </button>
-                </Badge>
               </Link>
+              <Badge colorScheme="red">
+                <DeleteConfirmation
+                  onConfirmDelete={() => deleteEvent(event.id)}
+                  eventId={event.id}
+                  onCancelDelete={cancelDelete}
+                />
+              </Badge>
               <Badge colorScheme="yellow">
                 <button onClick={() => openEditModal(event)}>Edit Event</button>
                 <Modal
@@ -236,6 +257,7 @@ export const EventsPage = () => {
                         editEvent={editEvent}
                         categories={categories}
                         closeEditModal={closeEditModal}
+                        setImage={setImage}
                       />
                     )}
                   </ModalContent>
