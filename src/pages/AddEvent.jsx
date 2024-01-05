@@ -35,7 +35,7 @@ export const AddEvent = ({ addEvent, categories }) => {
 
     try {
       const response = await addEvent(newEvent);
-      if (response.ok) {
+      if (response && response.ok) {
         const eventResponse = await fetch(
           `http://localhost:3000/events/${response.id}`
         );

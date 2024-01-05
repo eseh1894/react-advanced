@@ -26,6 +26,7 @@ export const EventPage = () => {
     const fetchEventDetails = async () => {
       try {
         const response = await fetch(`http://localhost:3000/events/${eventId}`);
+        console.log("Event Response:", response);
         const userResponse = await fetch(`http://localhost:3000/users`);
         const categoryResponse = await fetch(
           `http://localhost:3000/categories`
