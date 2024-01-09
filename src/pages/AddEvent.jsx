@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const AddEvent = ({ addEvent, categories }) => {
+export const AddEvent = ({ addEvent, categories, users }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState([]);
@@ -8,6 +8,7 @@ export const AddEvent = ({ addEvent, categories }) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -31,24 +32,11 @@ export const AddEvent = ({ addEvent, categories }) => {
       startTime,
       endTime,
       categoryIds: selectedCategory,
+      createdBy: selectedUser,
     };
 
     try {
-      const response = await addEvent(newEvent);
-      if (response && response.ok) {
-        const eventResponse = await fetch(
-          `http://localhost:3000/events/${response.id}`
-        );
-        if (!eventResponse.ok) {
-          throw new Error("Failed to fetch newly added event details");
-        }
-        const eventData = await eventResponse.json();
-        setEventDetails(eventData);
-
-        history.push(`/event/${response.id}`);
-      } else {
-        throw new Error("Failed to add event");
-      }
+      await addEvent(newEvent);
     } catch (error) {
       console.error("Error adding event:", error);
     }
@@ -67,6 +55,23 @@ export const AddEvent = ({ addEvent, categories }) => {
     );
 
     setSelectedCategory(selectedCategoryIds);
+  };
+
+  const handleUserChange = (e) => {
+    const selectedUserId = parseInt(e.target.value);
+    setSelectedUser(selectedUserId);
+  };
+
+  const handleSubmitUser = async (e) => {
+    e.preventDefault();
+
+    const newUser = {};
+
+    try {
+      await addUser(newUser);
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
   };
 
   return (
@@ -89,7 +94,7 @@ export const AddEvent = ({ addEvent, categories }) => {
           type="file"
           placeholder="image"
           accept="image/*"
-          onChange={(e) => setImage(e.target.value)}
+          onChange={(e) => handleImageChange(e)}
         />
         <input
           type="text"
@@ -127,6 +132,14 @@ export const AddEvent = ({ addEvent, categories }) => {
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
+            </option>
+          ))}
+        </select>
+        <select value={selectedUser} onChange={handleUserChange}>
+          <option value="">Select User</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
             </option>
           ))}
         </select>

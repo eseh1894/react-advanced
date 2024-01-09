@@ -37,11 +37,12 @@ export const EventPage = () => {
         }
 
         const eventData = await response.json();
+
         const userData = await userResponse.json();
         const categoryData = await categoryResponse.json();
 
         setCategoryDetails(categoryData);
-
+        setUserDetails(userData);
         setEventDetails(eventData);
 
         const creator = userData.find(
@@ -60,6 +61,10 @@ export const EventPage = () => {
     fetchEventDetails();
   }, [eventId]);
 
+  const setImage = (imageData) => {
+    setImageData(imageData);
+  };
+
   const openEditModal = () => {
     setIsEditModalOpen(true);
   };
@@ -76,6 +81,66 @@ export const EventPage = () => {
     setEventToDelete(null);
   };
 
+  const deleteEvent = async (eventId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/events/${eventId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete event");
+      }
+
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event.id !== eventId)
+      );
+
+      console.log(`Event with ID ${eventId} deleted`);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const categoryResponse = await fetch("http://localhost:3000/categories");
+      if (!categoryResponse.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const categoryData = await categoryResponse.json();
+      categoryDetails(categoryData);
+      console.log(categoryData);
+    } catch (error) {
+      console.log("Error fetching categories:", error);
+    }
+  };
+
+  const editEvent = async (eventId, updatedEventData) => {
+    try {
+      const response = await fetch(`http://localhost:3000/events/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedEventData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to edit event");
+      }
+
+      const editedEvent = await response.json();
+
+      setEventDetails(editedEvent);
+
+      setIsEditModalOpen(false);
+
+      console.log(`Event with ID ${eventId} edited`);
+    } catch (error) {
+      console.error("Error editing event:", error);
+    }
+  };
+
   return (
     <div className="event-page">
       <Heading>Event</Heading>
@@ -90,8 +155,15 @@ export const EventPage = () => {
             <Image src={eventDetails.image} alt={eventDetails.title} />
           )}
           {categoryDetails.map((category) => {
-            if (category.id === eventDetails.selectedCategory) {
-              return <Text key={category.id}>Category: {category.name}</Text>;
+            if (
+              eventDetails.categoryIds &&
+              eventDetails.categoryIds.includes(category.id)
+            ) {
+              return (
+                <Badge key={category.id} colorScheme="purple">
+                  <Text key={category.id}>Category: {category.name}</Text>
+                </Badge>
+              );
             }
             return null;
           })}
@@ -113,10 +185,10 @@ export const EventPage = () => {
                 {eventDetails && (
                   <EditEvents
                     event={eventDetails}
-                    editEvent={() => {}}
+                    editEvent={editEvent}
                     categories={categoryDetails}
                     closeEditModal={closeEditModal}
-                    setImage={() => {}}
+                    setImage={setImage}
                   />
                 )}
               </ModalContent>
@@ -132,7 +204,6 @@ export const EventPage = () => {
               onCancelDelete={cancelDelete}
             />
           </Badge>
-          ;
         </>
       )}
     </div>

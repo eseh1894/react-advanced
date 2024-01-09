@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
 
 export const EditEvents = ({ editEvent, categories, event, setImage }) => {
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description);
-  const [imageState, setImageState] = useState("");
+  const [imageState, setImageState] = useState(event.image);
   const [location, setLoaction] = useState(event.location);
   const [startTime, setStartTime] = useState(event.startTime);
   const [endTime, setEndTime] = useState(event.endTime);
@@ -12,8 +12,19 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
 
   const toast = useToast();
 
+  useEffect(() => {
+    setImageState(event.image);
+  }, [event.image]);
+
   const handleImageChange = (e) => {
-    setImageState(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageState(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -69,7 +80,7 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
           type="file"
           placeholder="image"
           accept="image/*"
-          onChange={(e) => setImageState(e.target.value)}
+          onChange={(e) => handleImageChange(e)}
         />
 
         <input
@@ -98,7 +109,7 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
             const selectedCategoryIds = [];
             for (let i = 0; i < options.length; i++) {
               if (options[i].selected) {
-                selectedCategoryIds.push(options[i].value);
+                selectedCategoryIds.push(parseInt(options[i].value));
               }
             }
             setSelectedCategory(selectedCategoryIds);

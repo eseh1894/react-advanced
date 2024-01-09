@@ -11,12 +11,13 @@ import {
   ModalContent,
   ModalFooter,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
 import { SearchBar } from "../components/SearchBar";
 import { EventFilter } from "../components/EventFilter";
 import { EditEvents } from "./EditEvents";
 import { DeleteConfirmation } from "../components/DeleteConfirmation";
+import { AddUser } from "../components/AddUser";
 
 export const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -24,9 +25,11 @@ export const EventsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [users, setUsers] = useState([]);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   const [eventToDelete, setEventToDelete] = useState(null);
   const [image, setImage] = useState("");
@@ -54,6 +57,8 @@ export const EventsPage = () => {
     }
   };
 
+  const history = useNavigate();
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -67,6 +72,20 @@ export const EventsPage = () => {
         console.log(eventData);
       } catch (error) {
         console.error("Error fetching events:", error);
+      }
+    };
+
+    const fetchUsers = async () => {
+      try {
+        const userResponse = await fetch("http://localhost:3000/users");
+        if (!userResponse.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const userData = await userResponse.json();
+        setUsers(userData);
+        console.log(userData);
+      } catch (error) {
+        console.error("Error fetching users:", error);
       }
     };
 
@@ -87,6 +106,7 @@ export const EventsPage = () => {
     };
 
     fetchEvents();
+    fetchUsers();
     fetchCategories();
   }, [isEditModalOpen, isModalOpen]);
 
@@ -108,6 +128,7 @@ export const EventsPage = () => {
 
       setEvents((prevEvents) => [...prevEvents, newEvent]);
       setIsModalOpen(false);
+      history(`/event/${newEvent.id}`);
     } catch (error) {
       console.error("Error adding event:", error);
     }
@@ -165,6 +186,28 @@ export const EventsPage = () => {
     }
   };
 
+  const addUser = async (user) => {
+    try {
+      const response = await fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add user");
+      }
+
+      const newUser = await response.json();
+
+      setUsers((prevUsers) => [...prevUsers, newUser]);
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
+  };
+
   const openEditModal = (event) => {
     setSelectedEvent(event);
     setIsEditModalOpen(true);
@@ -180,6 +223,14 @@ export const EventsPage = () => {
 
   const cancelDelete = () => {
     setEventToDelete(null);
+  };
+
+  const openUserModal = () => {
+    setIsUserModalOpen(true);
+  };
+
+  const closeUserModal = () => {
+    setIsUserModalOpen(false);
   };
 
   return (
@@ -198,13 +249,30 @@ export const EventsPage = () => {
         onClose={() => setIsModalOpen(false)}
       >
         <ModalContent>
-          <AddEvent addEvent={addEvent} categories={categories} />
+          <AddEvent addEvent={addEvent} categories={categories} users={users} />
           <ModalFooter>
             <Button
               colorScheme="blue"
               mr={3}
               onClick={() => setIsModalOpen(false)}
             >
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Button onClick={() => setIsUserModalOpen(true)}>Add User</Button>
+
+      <Modal
+        blockScrollOnMount={false}
+        isOpen={isUserModalOpen}
+        onClose={closeUserModal}
+      >
+        <ModalContent>
+          <AddUser addUser={addUser} />
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={closeUserModal}>
               Close
             </Button>
           </ModalFooter>
@@ -229,7 +297,7 @@ export const EventsPage = () => {
                   {categories.map((category) =>
                     event.categoryIds &&
                     event.categoryIds.includes(category.id) ? (
-                      <Badge colorScheme="purple">
+                      <Badge key={category.id} colorScheme="purple">
                         <Text key={category.id}>Category: {category.name}</Text>
                       </Badge>
                     ) : null
