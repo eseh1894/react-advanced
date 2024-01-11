@@ -9,11 +9,12 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { EditEvents } from "./EditEvents";
 import { DeleteConfirmation } from "../components/DeleteConfirmation";
 
 export const EventPage = () => {
+  const navigate = useNavigate();
   const { eventId } = useParams();
   const [eventDetails, setEventDetails] = useState({});
   const [userDetails, setUserDetails] = useState({});
@@ -91,11 +92,10 @@ export const EventPage = () => {
         throw new Error("Failed to delete event");
       }
 
-      setEvents((prevEvents) =>
-        prevEvents.filter((event) => event.id !== eventId)
-      );
+      setEventDetails({});
 
       console.log(`Event with ID ${eventId} deleted`);
+      navigate("/");
     } catch (error) {
       console.error("Error deleting event:", error);
     }

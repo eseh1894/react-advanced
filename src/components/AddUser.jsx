@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useToast } from "@chakra-ui/react";
 
 export const AddUser = ({ addUser }) => {
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,8 +18,24 @@ export const AddUser = ({ addUser }) => {
       await addUser(newUser);
       setName("");
       setImage("");
+
+      toast({
+        title: "User Added",
+        description: "New user has been added.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error adding user:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to add the user.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "@chakra-ui/react";
 
 export const AddEvent = ({ addEvent, categories, users }) => {
   const [title, setTitle] = useState("");
@@ -9,6 +10,7 @@ export const AddEvent = ({ addEvent, categories, users }) => {
   const [endTime, setEndTime] = useState("");
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
+  const toast = useToast();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -37,8 +39,23 @@ export const AddEvent = ({ addEvent, categories, users }) => {
 
     try {
       await addEvent(newEvent);
+
+      toast({
+        title: "Event Added",
+        description: "New event has been added.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error adding event:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add the event.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
 
     setTitle("");
