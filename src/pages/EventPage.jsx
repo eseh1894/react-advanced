@@ -41,19 +41,21 @@ export const EventPage = () => {
 
         const userData = await userResponse.json();
         const categoryData = await categoryResponse.json();
+        console.log("User Data:", userData);
+        console.log("Category Data:", categoryData);
 
         setCategoryDetails(categoryData);
-        setUserDetails(userData);
         setEventDetails(eventData);
 
         const creator = userData.find(
-          (user) => user.id === eventData.createdBy
+          (user) => user.id === String(eventData.createdBy)
         );
         setUserDetails(creator);
+        setUserDetails(creator);
 
-        console.log(eventData);
-
-        console.log(categoryDetails);
+        console.log("Event Details:", eventDetails);
+        console.log("User Details:", userDetails);
+        console.log("Category Details:", categoryDetails);
       } catch (error) {
         console.error("Error fetching event:", error);
       }
@@ -108,7 +110,7 @@ export const EventPage = () => {
         throw new Error("Failed to fetch categories");
       }
       const categoryData = await categoryResponse.json();
-      categoryDetails(categoryData);
+      setCategoryDetails(categoryData);
       console.log(categoryData);
     } catch (error) {
       console.log("Error fetching categories:", error);
@@ -171,7 +173,7 @@ export const EventPage = () => {
           <Image
             borderRadius="full"
             boxSize="150px"
-            alt="{userDetaisl.name}"
+            alt={userDetails.name}
             src={userDetails.image}
           />
           <Badge colorScheme="yellow">

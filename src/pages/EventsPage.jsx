@@ -10,6 +10,8 @@ import {
   Modal,
   ModalContent,
   ModalFooter,
+  Box,
+  FormLabel,
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import { AddEvent } from "./AddEvent";
@@ -249,6 +251,7 @@ export const EventsPage = () => {
         onClose={() => setIsModalOpen(false)}
       >
         <ModalContent>
+          <FormLabel>Create Event</FormLabel>
           <AddEvent addEvent={addEvent} categories={categories} users={users} />
           <ModalFooter>
             <Button
@@ -294,16 +297,21 @@ export const EventsPage = () => {
                   <Text>{event.description}</Text>
                   <Text> Start Time: {event.startTime}</Text>
                   <Text> End Time: {event.endTime}</Text>
-                  {categories.map((category) =>
-                    event.categoryIds &&
-                    event.categoryIds.includes(category.id) ? (
-                      <Badge key={category.id} colorScheme="purple">
-                        <Text key={category.id}>Category: {category.name}</Text>
-                      </Badge>
-                    ) : null
-                  )}
+                  <Box>
+                    {categories.map((category) =>
+                      event.categoryIds &&
+                      event.categoryIds.includes(category.id) ? (
+                        <Badge key={category.id} colorScheme="purple">
+                          <Text key={category.id}>
+                            Category: {category.name}
+                          </Text>
+                        </Badge>
+                      ) : null
+                    )}
+                  </Box>
                 </Card>
               </Link>
+
               <Badge colorScheme="red">
                 <DeleteConfirmation
                   onConfirmDelete={() => deleteEvent(event.id)}

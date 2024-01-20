@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@chakra-ui/react";
+import { useToast, Input, FormLabel, Select } from "@chakra-ui/react";
 
 export const EditEvents = ({ editEvent, categories, event, setImage }) => {
   const [title, setTitle] = useState(event.title);
@@ -62,46 +62,46 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
 
   return (
     <div>
-      Edit Event
+      <FormLabel>Edit Event</FormLabel>
       <form onSubmit={handleSubmit}>
-        <input
+        <Input
           type="text"
           placeholder="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <input
+        <Input
           type="file"
           placeholder="image"
           accept="image/*"
           onChange={(e) => handleImageChange(e)}
         />
 
-        <input
+        <Input
           type="text"
           placeholder="location"
           value={location}
           onChange={(e) => setLoaction(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="Start Time"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="End Time"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
         />
-        <select
+        <Select
           multiple
           value={selectedCategory}
           onChange={(e) => {
@@ -121,7 +121,7 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
               {category.name}
             </option>
           ))}
-        </select>
+        </Select>
 
         <button type="submit" onClick={handleSubmit}>
           Save Changes

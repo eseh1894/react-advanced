@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useToast } from "@chakra-ui/react";
+import { useToast, Input, FormLabel, Select } from "@chakra-ui/react";
 
 export const AddEvent = ({ addEvent, categories, users }) => {
   const [title, setTitle] = useState("");
@@ -93,39 +93,38 @@ export const AddEvent = ({ addEvent, categories, users }) => {
 
   return (
     <div>
-      AddEvent
       <form onSubmit={handleSubmit}>
-        <input
+        <Input
           type="text"
           placeholder="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <input
+        <Input
           type="file"
           placeholder="image"
           accept="image/*"
           onChange={(e) => handleImageChange(e)}
         />
-        <input
+        <Input
           type="text"
           placeholder="location"
           value={location}
           onChange={(e) => setLoaction(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="Start Time"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="End Time"
           value={endTime}
@@ -145,21 +144,21 @@ export const AddEvent = ({ addEvent, categories, users }) => {
             setSelectedCategory(selectedCategoryIds);
           }}
         >
-          <option value="">Select Category</option>
+          <FormLabel>Select Category</FormLabel>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
         </select>
-        <select value={selectedUser} onChange={handleUserChange}>
+        <Select value={selectedUser} onChange={handleUserChange}>
           <option value="">Select User</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
               {user.name}
             </option>
           ))}
-        </select>
+        </Select>
         <button type="submit" onClick={handleSubmit}>
           Add Event
         </button>
