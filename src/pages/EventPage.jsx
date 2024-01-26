@@ -8,6 +8,7 @@ import {
   ModalContent,
   ModalFooter,
   Button,
+  Link,
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import { EditEvents } from "./EditEvents";
@@ -28,21 +29,24 @@ export const EventPage = () => {
       try {
         const response = await fetch(`http://localhost:3000/events/${eventId}`);
         console.log("Event Response:", response);
-        const userResponse = await fetch(`http://localhost:3000/users`);
-        const categoryResponse = await fetch(
-          `http://localhost:3000/categories`
-        );
 
-        if (!response.ok || !userResponse.ok || !categoryResponse.ok) {
+        if (!response.ok) {
           throw new Error("Failed to fetch events");
         }
 
         const eventData = await response.json();
 
+        const userResponse = await fetch(`http://localhost:3000/users`);
+        const categoryResponse = await fetch(
+          `http://localhost:3000/categories`
+        );
+
+        if (!userResponse.ok || !categoryResponse.ok) {
+          throw new Error("Failed to fetch user or category");
+        }
+
         const userData = await userResponse.json();
         const categoryData = await categoryResponse.json();
-        console.log("User Data:", userData);
-        console.log("Category Data:", categoryData);
 
         setCategoryDetails(categoryData);
         setEventDetails(eventData);
@@ -50,12 +54,14 @@ export const EventPage = () => {
         const creator = userData.find(
           (user) => user.id === String(eventData.createdBy)
         );
-        setUserDetails(creator);
-        setUserDetails(creator);
 
-        console.log("Event Details:", eventDetails);
-        console.log("User Details:", userDetails);
-        console.log("Category Details:", categoryDetails);
+        if (creator) {
+          setUserDetails(creator);
+        }
+
+        console.log("Event Details:", eventData);
+        console.log("User Details:", creator);
+        console.log("Category Details:", categoryData);
       } catch (error) {
         console.error("Error fetching event:", error);
       }
@@ -111,7 +117,7 @@ export const EventPage = () => {
       }
       const categoryData = await categoryResponse.json();
       setCategoryDetails(categoryData);
-      console.log(categoryData);
+      console.log("category data:", categoryData);
     } catch (error) {
       console.log("Error fetching categories:", error);
     }
@@ -149,6 +155,8 @@ export const EventPage = () => {
 
       {eventDetails && userDetails && categoryDetails.length > 0 && (
         <>
+          <Button onClick={() => navigate("/")}>Home</Button>
+
           <Heading>{eventDetails.title}</Heading>
           <Text>{eventDetails.description}</Text>
           <Text>Start Time: {eventDetails.startTime}</Text>

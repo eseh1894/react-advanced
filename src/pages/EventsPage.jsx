@@ -65,9 +65,14 @@ export const EventsPage = () => {
     const fetchEvents = async () => {
       try {
         const eventResponse = await fetch("http://localhost:3000/events");
+
         if (!eventResponse.ok) {
-          throw new Error("Failed to fetch events");
+          const errorData = await eventResponse.json();
+          throw new Error(
+            `Failed to fetch events: ${eventResponse.status} - ${errorData.message}`
+          );
         }
+
         const eventData = await eventResponse.json();
         setEvents(eventData);
         setFilteredEvents(eventData);
@@ -234,17 +239,21 @@ export const EventsPage = () => {
   const closeUserModal = () => {
     setIsUserModalOpen(false);
   };
+  console.log("Categories:", categories);
 
   return (
     <div className="events-list">
       <Heading>List of events</Heading>
       <SearchBar onSearch={handleSearch} />
+
       <EventFilter
         categories={categories}
         onSelectCategory={handleCategorySelect}
       />
 
-      <Button onClick={() => setIsModalOpen(true)}>Add Event</Button>
+      <Button colorScheme="teal" mt={4} onClick={() => setIsModalOpen(true)}>
+        Add Event
+      </Button>
       <Modal
         blockScrollOnMount={false}
         isOpen={isModalOpen}
@@ -265,7 +274,13 @@ export const EventsPage = () => {
         </ModalContent>
       </Modal>
 
-      <Button onClick={() => setIsUserModalOpen(true)}>Add User</Button>
+      <Button
+        colorScheme="teal"
+        mt={4}
+        onClick={() => setIsUserModalOpen(true)}
+      >
+        Add User
+      </Button>
 
       <Modal
         blockScrollOnMount={false}
@@ -287,7 +302,7 @@ export const EventsPage = () => {
           {filteredEvents.map((event) => (
             <li key={event.id}>
               <Link key={event.id} to={`/event/${event.id}`}>
-                <Card key={event.id} maxW="sm">
+                <Card key={event.id} maxW="sm" boxShadow="md" rounded="md">
                   <Image
                     src={event.image}
                     alt={event.title}
@@ -298,16 +313,17 @@ export const EventsPage = () => {
                   <Text> Start Time: {event.startTime}</Text>
                   <Text> End Time: {event.endTime}</Text>
                   <Box>
-                    {categories.map((category) =>
-                      event.categoryIds &&
-                      event.categoryIds.includes(category.id) ? (
+                    {categories.map((category) => {
+                      // console.log("Category ID:", category.id);
+                      return event.categoryIds &&
+                        event.categoryIds.includes(category.id) ? (
                         <Badge key={category.id} colorScheme="purple">
                           <Text key={category.id}>
                             Category: {category.name}
                           </Text>
                         </Badge>
-                      ) : null
-                    )}
+                      ) : null;
+                    })}
                   </Box>
                 </Card>
               </Link>
@@ -319,8 +335,12 @@ export const EventsPage = () => {
                   onCancelDelete={cancelDelete}
                 />
               </Badge>
-              <Badge colorScheme="yellow">
-                <button onClick={() => openEditModal(event)}>Edit Event</button>
+              <Button
+                colorScheme="yellow"
+                ml={2}
+                onClick={() => openEditModal(event)}
+              >
+                Edit Event
                 <Modal
                   blockScrollOnMount={false}
                   isOpen={isEditModalOpen}
@@ -341,7 +361,7 @@ export const EventsPage = () => {
                     <button onClick={() => deleteEvent(event.id)}>Close</button>
                   </ModalFooter>
                 </Modal>
-              </Badge>
+              </Button>
             </li>
           ))}
         </SimpleGrid>

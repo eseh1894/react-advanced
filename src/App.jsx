@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { EventsPage } from "./pages/EventsPage";
-import { EventPage } from "./pages/EventsPage";
+import { EventPage } from "./pages/EventPage";
 
 const App = () => {
   return (

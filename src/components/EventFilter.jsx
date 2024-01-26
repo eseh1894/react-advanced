@@ -9,7 +9,10 @@ export const EventFilter = ({ categories, onSelectCategory }) => {
         {categories.map((category) => (
           <MenuItem
             key={category.id}
-            onClick={() => onSelectCategory(category.id)}
+            onClick={() => {
+              console.log("Selected Category ID:", category.id);
+              onSelectCategory(category.id);
+            }}
           >
             {category.name}
           </MenuItem>

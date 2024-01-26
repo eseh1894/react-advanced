@@ -101,7 +101,7 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
         />
-        <Select
+        <select
           multiple
           value={selectedCategory}
           onChange={(e) => {
@@ -115,13 +115,13 @@ export const EditEvents = ({ editEvent, categories, event, setImage }) => {
             setSelectedCategory(selectedCategoryIds);
           }}
         >
-          <option value="">Select Category</option>
+          <FormLabel>Select Category</FormLabel>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
-        </Select>
+        </select>
 
         <button type="submit" onClick={handleSubmit}>
           Save Changes
