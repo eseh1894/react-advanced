@@ -156,6 +156,7 @@ export const EventsPage = () => {
       );
 
       console.log(`Event with ID ${eventId} deleted`);
+      window.location.reload();
     } catch (error) {
       console.error("Error deleting event:", error);
     }
@@ -328,13 +329,12 @@ export const EventsPage = () => {
                 </Card>
               </Link>
 
-              <Badge colorScheme="red">
-                <DeleteConfirmation
-                  onConfirmDelete={() => deleteEvent(event.id)}
-                  eventId={event.id}
-                  onCancelDelete={cancelDelete}
-                />
-              </Badge>
+              <DeleteConfirmation
+                onConfirmDelete={() => deleteEvent(event.id)}
+                eventId={event.id}
+                onCancelDelete={cancelDelete}
+              />
+
               <Button
                 colorScheme="yellow"
                 ml={2}

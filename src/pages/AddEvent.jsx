@@ -119,13 +119,13 @@ export const AddEvent = ({ addEvent, categories, users }) => {
           onChange={(e) => setLoaction(e.target.value)}
         />
         <Input
-          type="text"
+          type="datetime-local"
           placeholder="Start Time"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
         />
         <Input
-          type="text"
+          type="datetime-local"
           placeholder="End Time"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
@@ -143,6 +143,7 @@ export const AddEvent = ({ addEvent, categories, users }) => {
             }
             setSelectedCategory(selectedCategoryIds);
           }}
+          required
         >
           <FormLabel>Select Category</FormLabel>
           {categories.map((category) => (
@@ -151,7 +152,7 @@ export const AddEvent = ({ addEvent, categories, users }) => {
             </option>
           ))}
         </select>
-        <Select value={selectedUser} onChange={handleUserChange}>
+        <Select value={selectedUser} onChange={handleUserChange} required>
           <option value="">Select User</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
